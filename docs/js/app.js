@@ -558,7 +558,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  runTrialSemanticBtn.addEventListener("click", () => triggerSemanticAnalysis());
+  if (runTrialSemanticBtn) {
+    runTrialSemanticBtn.addEventListener("click", () => triggerSemanticAnalysis());
+  }
 
   function renderCategories(report) {
     categoriesList.innerHTML = "";
@@ -760,27 +762,33 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Modal Settings
-  settingsBtn.addEventListener("click", () => settingsModal.classList.add("active"));
-  closeModalBtn.addEventListener("click", () => settingsModal.classList.remove("active"));
-  saveSettingsBtn.addEventListener("click", () => {
-    const token = githubTokenInput.value.trim();
-    if (token) {
-      localStorage.setItem("skillspector_gh_token", token);
-      fetcher.setToken(token);
-    } else {
-      localStorage.removeItem("skillspector_gh_token");
-      fetcher.setToken(null);
-    }
+  if (settingsBtn && settingsModal) {
+    settingsBtn.addEventListener("click", () => settingsModal.classList.add("active"));
+  }
+  if (closeModalBtn && settingsModal) {
+    closeModalBtn.addEventListener("click", () => settingsModal.classList.remove("active"));
+  }
+  if (saveSettingsBtn && settingsModal) {
+    saveSettingsBtn.addEventListener("click", () => {
+      const token = githubTokenInput.value.trim();
+      if (token) {
+        localStorage.setItem("skillspector_gh_token", token);
+        fetcher.setToken(token);
+      } else {
+        localStorage.removeItem("skillspector_gh_token");
+        fetcher.setToken(null);
+      }
 
-    const litellmEndpoint = litellmEndpointInput.value.trim();
-    const litellmKey = litellmKeyInput.value.trim();
-    const litellmModel = litellmModelInput.value.trim();
+      const litellmEndpoint = litellmEndpointInput.value.trim();
+      const litellmKey = litellmKeyInput.value.trim();
+      const litellmModel = litellmModelInput.value.trim();
 
-    if (litellmEndpoint) localStorage.setItem("skillspector_litellm_endpoint", litellmEndpoint);
-    if (litellmKey) localStorage.setItem("skillspector_litellm_key", litellmKey); else localStorage.removeItem("skillspector_litellm_key");
-    if (litellmModel) localStorage.setItem("skillspector_litellm_model", litellmModel);
+      if (litellmEndpoint) localStorage.setItem("skillspector_litellm_endpoint", litellmEndpoint);
+      if (litellmKey) localStorage.setItem("skillspector_litellm_key", litellmKey); else localStorage.removeItem("skillspector_litellm_key");
+      if (litellmModel) localStorage.setItem("skillspector_litellm_model", litellmModel);
 
-    settingsModal.classList.remove("active");
-    alert("Settings saved successfully.");
-  });
+      settingsModal.classList.remove("active");
+      alert("Settings saved successfully.");
+    });
+  }
 });

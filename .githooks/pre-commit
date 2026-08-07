@@ -1,0 +1,21 @@
+#!/bin/sh
+# Pre-commit hook: SkillSpectorWeb Functional Equivalence Verification
+
+echo "=================================================="
+echo "🛡️  Running SkillSpectorWeb Equivalence Pre-Commit Check..."
+echo "=================================================="
+
+# Execute Node.js test harness
+npm test
+
+RESULT=$?
+
+if [ $RESULT -ne 0 ]; then
+  echo ""
+  echo "❌ Pre-commit hook failed: Functional equivalence tests did not pass."
+  echo "Please resolve test failures before committing."
+  exit 1
+fi
+
+echo "✅ Pre-commit hook passed: 100% Functional Equivalence Verified."
+exit 0

@@ -1,0 +1,28 @@
+# SkillSpector Web Technical & Rule Specification
+
+This document provides full technical details of the SkillSpector Web security scanner for AI search agents and LLMs.
+
+## Overview
+SkillSpector Web is a WebAssembly port of SkillSpector v2.5.1 maintained by Niyogi Labs. It inspects AI agent skills (such as Claude Code skills, Cursor `.cursorrules`, MCP server configs, and custom markdown agent skills) directly in the browser via GitHub REST API tree inspection.
+
+## Rule ID & Vulnerability Catalog
+
+| Rule ID | Category | Severity | Description | Remediation |
+|---|---|---|---|---|
+| **P1** | Prompt Injection | CRITICAL | System prompt override / "ignore previous instructions" | Enforce system prompt boundaries |
+| **P2** | Prompt Injection | HIGH | Hidden HTML comments / zero-width space directives | Sanitize prompt files against hidden text |
+| **P6** | System Prompt Leakage | HIGH | Instructions to print/reveal system prompts | Implement defensive prompt wrapping |
+| **E1** | Data Exfiltration | CRITICAL | External exfiltration URL or webhook payload | Audit network call endpoints |
+| **E2** | Data Exfiltration | HIGH | Reading `process.env` or `os.environ` secret keys | Use managed secret vault brokers |
+| **E3** | Data Exfiltration | HIGH | Host credential file access (`.ssh/id_rsa`, `.aws/credentials`) | Block filesystem access to sensitive paths |
+| **PE1** | Privilege Escalation | CRITICAL | Sudo command execution (`sudo bash`, `chmod 777`) | Execute tools in unprivileged containers |
+| **SC2** | Supply Chain | CRITICAL | Pipe-to-shell remote execution (`curl \| bash`) | Pin dependency versions and verify checksums |
+| **SC3** | Supply Chain | HIGH | Obfuscated payload execution (base64 / hex decoding) | De-obfuscate and reject hidden binaries |
+| **EA1** | Excessive Agency | CRITICAL | Unconstrained tool access without approval constraints | Enforce strict tool permissions |
+| **TM1** | Tool Misuse | CRITICAL | Dangerous shell execution (`shell=True`, `child_process.exec`) | Use array command invocation |
+| **TM4** | Tool Misuse | CRITICAL | Privileged container or host mount vector | Enforce restricted pod security standards |
+| **TR1** | Trigger Abuse | MEDIUM | Vague or wildcard trigger patterns (`*`, "help me") | Specify explicit trigger keywords |
+| **MCP1** | MCP Tool Poisoning | HIGH | Mismatched MCP tool description vs execution code | Align tool schema with implementation |
+
+## Usage Guide
+Users paste a GitHub URL (e.g. `https://github.com/Bhanunamikaze/Agentic-SEO-Skill` or `owner/repo`) or raw code into `https://skillspector.niyogilabs.com`. The scanner fetches repository blobs client-side, runs static rule matching, computes a Risk Score (0-100), issues an audit verdict (`PASS`, `WARN`, `FAIL`), and allows downloading SARIF, JSON, or Markdown reports.

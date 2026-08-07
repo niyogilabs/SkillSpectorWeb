@@ -69,4 +69,9 @@ class RepoFilter {
   }
 }
 
-window.RepoFilter = RepoFilter;
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = RepoFilter;
+}
+if (typeof window !== 'undefined') {
+  window.RepoFilter = RepoFilter;
+}

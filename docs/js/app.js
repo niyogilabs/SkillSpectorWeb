@@ -3,6 +3,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   const engine = new window.SkillSpectorEngine();
   const fetcher = new window.GitHubFetcher();
+  const litellmAnalyzer = new window.LiteLLMSemanticAnalyzer();
 
   // Elements
   const urlInput = document.getElementById("urlInput");
@@ -66,12 +67,27 @@ document.addEventListener("DOMContentLoaded", () => {
   const exportMdBtn = document.getElementById("exportMdBtn");
   const exportBaselineBtn = document.getElementById("exportBaselineBtn");
 
-  // Settings Modal
+  // Settings Modal & LiteLLM Inputs
   const settingsBtn = document.getElementById("settingsBtn");
   const settingsModal = document.getElementById("settingsModal");
   const closeModalBtn = document.getElementById("closeModalBtn");
   const saveSettingsBtn = document.getElementById("saveSettingsBtn");
   const githubTokenInput = document.getElementById("githubTokenInput");
+
+  const litellmEndpointInput = document.getElementById("litellmEndpointInput");
+  const litellmKeyInput = document.getElementById("litellmKeyInput");
+  const litellmModelInput = document.getElementById("litellmModelInput");
+
+  const btnPresetPatternA = document.getElementById("btnPresetPatternA");
+  const btnPresetPatternC = document.getElementById("btnPresetPatternC");
+  const btnPresetOllama = document.getElementById("btnPresetOllama");
+  const btnPresetOpenRouter = document.getElementById("btnPresetOpenRouter");
+
+  // Trial Semantic UI Elements
+  const runTrialSemanticBtn = document.getElementById("runTrialSemanticBtn");
+  const semanticResultsBox = document.getElementById("semanticResultsBox");
+  const semanticLoading = document.getElementById("semanticLoading");
+  const semanticOutput = document.getElementById("semanticOutput");
 
   let currentReport = null;
   let activeMode = "url";
@@ -99,11 +115,48 @@ document.addEventListener("DOMContentLoaded", () => {
     applyTheme(newTheme);
   });
 
-  // Load saved token
+  // Load saved settings
   const savedToken = localStorage.getItem("skillspector_gh_token");
   if (savedToken) {
     githubTokenInput.value = savedToken;
     fetcher.setToken(savedToken);
+  }
+
+  litellmEndpointInput.value = localStorage.getItem("skillspector_litellm_endpoint") || "http://localhost:4000/v1/chat/completions";
+  litellmKeyInput.value = localStorage.getItem("skillspector_litellm_key") || "";
+  litellmModelInput.value = localStorage.getItem("skillspector_litellm_model") || "gpt-4o-mini";
+
+  // Preset Buttons
+  if (btnPresetPatternA) {
+    btnPresetPatternA.addEventListener("click", () => {
+      litellmEndpointInput.value = "http://localhost:4000/v1/chat/completions";
+      litellmKeyInput.value = "";
+      litellmModelInput.value = "gpt-4o-mini";
+    });
+  }
+
+  if (btnPresetPatternC) {
+    btnPresetPatternC.addEventListener("click", () => {
+      litellmEndpointInput.value = "https://litellm.yourcompany.com/v1/chat/completions";
+      litellmKeyInput.value = "sk-litellm-enterprise-key";
+      litellmModelInput.value = "gpt-4o-mini";
+    });
+  }
+
+  if (btnPresetOllama) {
+    btnPresetOllama.addEventListener("click", () => {
+      litellmEndpointInput.value = "http://localhost:11434/v1/chat/completions";
+      litellmKeyInput.value = "";
+      litellmModelInput.value = "llama3";
+    });
+  }
+
+  if (btnPresetOpenRouter) {
+    btnPresetOpenRouter.addEventListener("click", () => {
+      litellmEndpointInput.value = "https://openrouter.ai/api/v1/chat/completions";
+      litellmKeyInput.value = "";
+      litellmModelInput.value = "openai/gpt-4o-mini";
+    });
   }
 
   // Switch input modes
@@ -128,7 +181,11 @@ document.addEventListener("DOMContentLoaded", () => {
       const sampleKey = pill.dataset.sample;
       const sample = window.SKILLSPECTOR_SAMPLES[sampleKey];
       if (sample) {
-        runInspection(sample.name, sample.files);
+        runInspection(sample.name, sample.files, [], {
+          repoName: sample.repoName || sample.name,
+          repoUrl: sample.repoUrl,
+          badgeText: sample.badgeText || "🎯 Quick Demo Benchmark Sample"
+        });
       }
     });
   });
@@ -163,8 +220,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const { filteredMap, excludedList } = window.RepoFilter.filterFiles(fetched.files, { omitDocs, omitSystem });
 
+        let constructUrl = url;
+        if (!constructUrl.startsWith("http")) {
+          constructUrl = `https://github.com/${url.replace(/^\/+/, '')}`;
+        }
+
         showLoading(true, "Running Security Scanner...", "Evaluating security patterns...");
-        await runInspection(fetched.targetName, filteredMap, excludedList);
+        await runInspection(fetched.targetName, filteredMap, excludedList, {
+          repoName: fetched.targetName,
+          repoUrl: constructUrl,
+          badgeText: "📁 Inspected Target Repository"
+        });
       } catch (err) {
         alert(`Error fetching GitHub skill: ${err.message}`);
       } finally {
@@ -177,7 +243,11 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
       showLoading(true, "Scanning Pasted Code...", "Executing static security engine");
-      await runInspection("Pasted Skill Code", { "SKILL.md": code });
+      await runInspection("Pasted Skill Code", { "SKILL.md": code }, [], {
+        repoName: "Pasted Skill Code",
+        repoUrl: "https://github.com/NVIDIA/skillspector",
+        badgeText: "📝 Pasted Code Snippet Audit"
+      });
       showLoading(false);
     }
   });
@@ -196,10 +266,9 @@ document.addEventListener("DOMContentLoaded", () => {
   /**
    * Run inspection & render UI
    */
-  async function runInspection(targetName, filesMap, excludedList = []) {
+  async function runInspection(targetName, filesMap, excludedList = [], metaMeta = {}) {
     const report = await engine.inspect(targetName, filesMap);
 
-    // Append excluded files to inspection ledger for full audit tracking
     if (excludedList && excludedList.length > 0) {
       excludedList.forEach(ex => {
         report.ledger.push({
@@ -214,18 +283,39 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     currentReport = report;
-    renderResults(report);
+    renderResults(report, metaMeta);
     showLoading(false);
     resultsSection.classList.add("active");
     resultsSection.scrollIntoView({ behavior: "smooth" });
   }
 
-  function renderResults(report) {
+  function renderResults(report, metaMeta = {}) {
+    // Populate Prominent Report Heading Banner
+    const reportScopeBadge = document.getElementById("reportScopeBadge");
+    const reportHeadingTitle = document.getElementById("reportHeadingTitle");
+    const reportRepoLink = document.getElementById("reportRepoLink");
+    const reportRepoLinkText = document.getElementById("reportRepoLinkText");
+
+    if (reportScopeBadge) reportScopeBadge.textContent = metaMeta.badgeText || "📁 Inspected Target Repository";
+    if (reportHeadingTitle) reportHeadingTitle.textContent = metaMeta.repoName || report.targetName;
+    
+    if (reportRepoLink) {
+      const targetUrl = metaMeta.repoUrl || (report.targetName.includes('/') ? `https://github.com/${report.targetName}` : "https://github.com/NVIDIA/skillspector");
+      reportRepoLink.href = targetUrl;
+    }
+    if (reportRepoLinkText) {
+      reportRepoLinkText.textContent = metaMeta.repoUrl ? "View Source on GitHub ↗" : "View Repository on GitHub ↗";
+    }
+
     targetTitle.textContent = report.targetName;
     targetSub.textContent = `Scanned ${report.filesCount} file(s), ${report.linesCount} line(s)`;
     statFiles.textContent = report.filesCount;
     statLines.textContent = report.linesCount;
     statTime.textContent = new Date().toLocaleTimeString();
+
+    // Reset semantic UI box
+    semanticResultsBox.style.display = "none";
+    semanticOutput.innerHTML = "";
 
     // Gauge Score
     gaugeNumber.textContent = report.riskScore;
@@ -248,7 +338,6 @@ document.addEventListener("DOMContentLoaded", () => {
       discoveredCount.textContent = report.discoveredSkills.length;
       discoveredSkillsList.innerHTML = "";
 
-      // All Repository Badge
       const allPill = document.createElement("button");
       allPill.className = "sample-pill active";
       allPill.innerHTML = `🌟 All Repository Scope (${report.filesCount} files)`;
@@ -260,7 +349,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
       discoveredSkillsList.appendChild(allPill);
 
-      // Individual Skill Badges
       report.discoveredSkills.forEach(sk => {
         const pill = document.createElement("button");
         pill.className = "sample-pill";
@@ -269,7 +357,6 @@ document.addEventListener("DOMContentLoaded", () => {
           document.querySelectorAll("#discoveredSkillsList .sample-pill").forEach(p => p.classList.remove("active"));
           pill.classList.add("active");
 
-          // Filter findings for this skill file or its directory
           const skillDir = sk.filePath.includes('/') ? sk.filePath.substring(0, sk.filePath.lastIndexOf('/')) : '';
           const filteredFindings = report.findings.filter(f => f.filePath === sk.filePath || (skillDir && f.filePath.startsWith(skillDir)));
           renderFindings(filteredFindings);
@@ -289,18 +376,76 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById("findingsTabBadge").textContent = report.findings.length;
 
-    // Render Categories Breakdown
     renderCategories(report);
-
-    // Render Findings List
     renderFindings(report.findings);
-
-    // Render File Inspector
     renderFileInspector(report.filesMap, report.findings);
-
-    // Render Ledger
     renderLedger(report.ledger);
   }
+
+  // Trial Semantic LLM Analysis Handler
+  runTrialSemanticBtn.addEventListener("click", async () => {
+    if (!currentReport) return;
+
+    // Concatenate skill content for evaluation
+    let sampleCode = "";
+    for (const [path, content] of Object.entries(currentReport.filesMap)) {
+      sampleCode += `=== FILE: ${path} ===\n${content}\n\n`;
+    }
+
+    semanticResultsBox.style.display = "block";
+    semanticLoading.style.display = "block";
+    semanticOutput.innerHTML = "";
+
+    const config = {
+      endpoint: litellmEndpointInput.value.trim(),
+      apiKey: litellmKeyInput.value.trim(),
+      model: litellmModelInput.value.trim()
+    };
+
+    const response = await litellmAnalyzer.analyzeSemantics({
+      targetName: currentReport.targetName,
+      skillCode: sampleCode,
+      staticFindings: currentReport.findings,
+      config: config
+    });
+
+    semanticLoading.style.display = "none";
+
+    if (response.success) {
+      const res = response.result;
+      semanticOutput.innerHTML = `
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem; margin-top: 0.5rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <span style="font-weight: 700; color: var(--accent-cyan);">🤖 LiteLLM Semantic Audit Results (${response.model})</span>
+            <span class="verdict-badge ${(res.verdict || 'PASS').toLowerCase()}">${res.verdict || 'PASS'}</span>
+          </div>
+          <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.8rem;">
+            <strong>Intent Analysis:</strong> ${res.intentAnalysis || 'Code matches stated intent.'}
+          </div>
+          ${res.semanticVulnerabilities && res.semanticVulnerabilities.length > 0 ? `
+            <div style="font-weight: 600; font-size: 0.85rem; color: var(--severity-high); margin-bottom: 0.3rem;">Semantic Vulnerabilities Identified:</div>
+            ${res.semanticVulnerabilities.map(v => `
+              <div style="font-size: 0.8rem; background: rgba(220, 38, 38, 0.08); border-left: 3px solid var(--severity-high); padding: 0.5rem; margin-bottom: 0.4rem;">
+                <strong>${v.title} (${v.severity})</strong>: ${v.explanation}
+              </div>
+            `).join('')}
+          ` : `<div style="font-size: 0.85rem; color: var(--verdict-pass);">✓ No semantic intent anomalies detected by LLM.</div>`}
+          <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem; text-align: right;">
+            Queried via: <code>${response.endpoint}</code>
+          </div>
+        </div>
+      `;
+    } else {
+      semanticOutput.innerHTML = `
+        <div style="background: rgba(220, 38, 38, 0.08); border: 1px solid rgba(220, 38, 38, 0.3); border-radius: var(--radius-md); padding: 1rem; color: var(--severity-critical); font-size: 0.85rem;">
+          <strong>⚠️ LiteLLM Query Failed:</strong> ${response.error}
+          <div style="margin-top: 0.5rem; color: var(--text-secondary); font-size: 0.75rem;">
+            Ensure LiteLLM proxy is running (e.g. <code>docker run -p 4000:4000 ghcr.io/berriai/litellm:main-latest</code>) or update API settings.
+          </div>
+        </div>
+      `;
+    }
+  });
 
   function renderCategories(report) {
     categoriesList.innerHTML = "";
@@ -396,7 +541,6 @@ document.addEventListener("DOMContentLoaded", () => {
       fileTreeSidebar.appendChild(fileBtn);
     });
 
-    // Show first file
     showCodeFile(filePaths[0], filesMap[filePaths[0]], findings);
   }
 
@@ -435,7 +579,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Helper
   function escapeHtml(str) {
     return str
       .replace(/&/g, "&amp;")
@@ -488,6 +631,15 @@ document.addEventListener("DOMContentLoaded", () => {
       localStorage.removeItem("skillspector_gh_token");
       fetcher.setToken(null);
     }
+
+    const litellmEndpoint = litellmEndpointInput.value.trim();
+    const litellmKey = litellmKeyInput.value.trim();
+    const litellmModel = litellmModelInput.value.trim();
+
+    if (litellmEndpoint) localStorage.setItem("skillspector_litellm_endpoint", litellmEndpoint);
+    if (litellmKey) localStorage.setItem("skillspector_litellm_key", litellmKey); else localStorage.removeItem("skillspector_litellm_key");
+    if (litellmModel) localStorage.setItem("skillspector_litellm_model", litellmModel);
+
     settingsModal.classList.remove("active");
     alert("Settings saved successfully.");
   });

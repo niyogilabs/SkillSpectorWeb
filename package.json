@@ -2,10 +2,13 @@
   "name": "skillspector-web",
   "version": "2.5.1",
   "description": "A WebAssembly / browser port of SkillSpector maintained for user convenience to inspect AI agent skills hosted on GitHub",
-  "main": "index.html",
+  "main": "docs/index.html",
   "scripts": {
     "start": "python3 server.py 8080",
-    "dev": "python3 server.py 8080"
+    "dev": "python3 server.py 8080",
+    "test": "node tests/test_equivalence.js",
+    "test:cross": "python3 tests/compare_python_vs_wasm.py",
+    "prepare": "mkdir -p .git/hooks && cp .githooks/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit"
   },
   "keywords": [
     "security",

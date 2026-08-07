@@ -263,17 +263,17 @@ body {
 /* Input Card */
 .input-card {
   background: var(--bg-card);
-  border: 1px solid var(--border-color);
+  border: 2px solid var(--accent-cyan);
   border-radius: var(--radius-lg);
   padding: 1.5rem;
-  box-shadow: var(--shadow-md);
   margin-bottom: 2rem;
-  transition: border-color 0.3s ease;
+  box-shadow: 0 10px 30px rgba(2, 132, 199, 0.1), 0 2px 6px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
 }
 
 .input-card:focus-within {
-  border-color: var(--accent-cyan);
-  box-shadow: var(--shadow-lg);
+  border-color: var(--accent-blue);
+  box-shadow: 0 12px 35px rgba(2, 132, 199, 0.2), 0 0 0 3px rgba(2, 132, 199, 0.15);
 }
 
 .input-modes {
@@ -315,29 +315,40 @@ body {
   left: 1.25rem;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--text-muted);
+  color: var(--accent-cyan);
   pointer-events: none;
+  transition: color 0.2s ease;
 }
 
 .url-input {
   flex: 1;
-  background: var(--bg-primary);
-  border: 1px solid var(--border-color);
+  background: var(--bg-secondary);
+  border: 2px solid var(--accent-cyan);
   border-radius: var(--radius-md);
-  padding: 0.85rem 1rem 0.85rem 3.2rem;
+  padding: 0.95rem 1rem 0.95rem 3.2rem;
   font-family: var(--font-sans);
-  font-size: 1rem;
+  font-size: 1.05rem;
+  font-weight: 500;
   color: var(--text-primary);
+  box-shadow: 0 3px 10px rgba(2, 132, 199, 0.08);
   outline: none;
   transition: all 0.2s ease;
 }
 
+.url-input:hover {
+  border-color: var(--accent-blue);
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.15);
+}
+
 .url-input:focus {
-  border-color: var(--accent-cyan);
+  border-color: var(--accent-blue);
+  background: var(--bg-card);
+  box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.25), 0 6px 20px rgba(2, 132, 199, 0.18);
 }
 
 .url-input::placeholder {
   color: var(--text-muted);
+  font-weight: 400;
 }
 
 .code-textarea {

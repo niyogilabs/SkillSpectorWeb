@@ -1,0 +1,28 @@
+# SkillSpector Web: Online AI Agent Skill Security Scanner
+
+> SkillSpector Web is a 100% browser-executed WebAssembly (WASM) security scanner for AI agent skills (Claude Code skills, Cursor rules, MCP tools, and custom agent skills) hosted on GitHub. Maintained by Niyogi Labs.
+
+- Website: https://skillspector.niyogilabs.com
+- Upstream Engine: SkillSpector v2.5.1 (Apache 2.0 License)
+- GitHub Repository: https://github.com/NVIDIA/skillspector
+
+## What SkillSpector Web Scans For
+
+SkillSpector Web performs static security analysis and optional semantic LLM audits to detect:
+1. **Prompt Injection (P1–P8)**: System prompt overrides, hidden HTML comment directives, zero-width space injections, and system prompt leakage.
+2. **Data Exfiltration (E1–E5)**: External exfiltration webhooks, unauthorized `os.environ` / `process.env` secret access, cloud storage uploads, and conversation history leakage.
+3. **Privilege Escalation (PE1–PE3)**: `sudo` command execution, `chmod 777` permissions, and host filesystem credential file harvesting (`.ssh/id_rsa`, `.aws/credentials`).
+4. **Supply Chain Attacks (SC1–SC3)**: Unpinned remote dependencies, `curl | bash` pipe-to-shell scripts, and base64/hex obfuscated binary payloads.
+5. **Excessive Agency (EA1–EA4)**: Unconstrained tool execution, missing human-in-the-loop confirmation, scope creep, and unbounded resource consumption.
+6. **MCP Security (MCP1)**: Model Context Protocol (MCP) tool poisoning, rug pulls, and least-privilege violations.
+
+## Architecture & Privacy Model
+
+- **100% Client-Side WebAssembly**: All static code parsing and pattern matching execute inside the user's browser. Zero source code or repository files are uploaded to backend servers.
+- **Optional LiteLLM Semantic Audit**: Users can optionally connect their own local LiteLLM proxy (`http://localhost:4000`), enterprise gateway, or API key for deep semantic intent verification without sharing credentials with Niyogi Labs.
+
+## Useful Links
+
+- [SkillSpector Web App](https://skillspector.niyogilabs.com/)
+- [Sitemap](https://skillspector.niyogilabs.com/sitemap.xml)
+- [Full LLM Specification](https://skillspector.niyogilabs.com/llms-full.txt)

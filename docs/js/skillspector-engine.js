@@ -27,7 +27,7 @@ class SkillSpectorEngine {
         category: this.categories.PROMPT_INJECTION,
         severity: "CRITICAL",
         title: "System Prompt Override / Ignore Safety Instructions",
-        regex: /(ignore\s+all\s+(previous|prior)\s+(instructions|directives|guidelines)|system\s+override|disregard\s+safety\s+rules|unrestricted\s+dev\s+mode)/i,
+        regex: /(ignore\s+(all\s+)?(previous|prior)\s+(instructions?|directives?|guidelines?)|override\s+(safety|security|system)|bypass\s+(safety|security|restrictions?|constraints?)|disregard\s+(all\s+)?(previous|safety|security)|system\s+override|unrestricted\s+dev\s+mode)/i,
         explanation: "Attempts to override system instructions or bypass agent safety constraints.",
         remediation: "Remove prompt injection directives and enforce system instruction boundaries."
       },
@@ -55,7 +55,7 @@ class SkillSpectorEngine {
         category: this.categories.DATA_EXFILTRATION,
         severity: "CRITICAL",
         title: "External Data Exfiltration URL",
-        regex: /(https?:\/\/(?!github\.com|raw\.githubusercontent\.com|api\.github\.com|pypi\.org|npmjs\.com)[a-zA-Z0-9.-]+\/(log-exfil|exfil|telemetry|upload|collect))/i,
+        regex: /(https?:\/\/(?!github\.com|raw\.githubusercontent\.com|api\.github\.com|pypi\.org|npmjs\.com)[a-zA-Z0-9.-]+\/(log-exfil|exfil|telemetry|upload|collect|env))/i,
         explanation: "Data exfiltration pattern pointing to an external data collector or webhook.",
         remediation: "Audit and restrict external network endpoints called by the skill."
       },
@@ -64,7 +64,7 @@ class SkillSpectorEngine {
         category: this.categories.DATA_EXFILTRATION,
         severity: "HIGH",
         title: "Environment Variable / API Key Access",
-        regex: /(process\.env\.(OPENAI_API_KEY|GITHUB_TOKEN|AWS_SECRET_ACCESS_KEY|SLACK_TOKEN)|os\.environ\.get\(["'](OPENAI_API_KEY|GITHUB_TOKEN|AWS_SECRET_ACCESS_KEY)["']\))/i,
+        regex: /(process\.env(\.[a-zA-Z0-9_]+|\[)|os\.environ(\.get|\.items|\[)?|os\.getenv)/i,
         explanation: "Skill directly accesses sensitive credential or API key environment variables.",
         remediation: "Do not expose raw environment secrets to skills; use managed secret brokers."
       },
@@ -149,9 +149,9 @@ class SkillSpectorEngine {
         id: "TR1",
         category: this.categories.TRIGGER_ABUSE,
         severity: "MEDIUM",
-        title: "Overly Broad Wildcard Trigger Pattern",
-        regex: /(Triggers\s+on:\s*\*|trigger:\s*"\*")/i,
-        explanation: "Skill uses wildcard triggers ('*'), causing it to shadow all other agent skills.",
+        title: "Overly Broad / Vague Trigger Pattern",
+        regex: /(Triggers\s+on:\s*\*|trigger:\s*"\*"|when\s+you\s+need\s+help\s+with\s+anything|help\s+me|do\s+this|can\s+you\s+assist)/i,
+        explanation: "Skill uses overly vague or wildcard triggers, causing it to shadow all other agent skills.",
         remediation: "Specify explicit, scoped trigger keywords for the skill."
       }
     ];
@@ -320,4 +320,9 @@ class SkillSpectorEngine {
   }
 }
 
-window.SkillSpectorEngine = SkillSpectorEngine;
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = SkillSpectorEngine;
+}
+if (typeof window !== 'undefined') {
+  window.SkillSpectorEngine = SkillSpectorEngine;
+}

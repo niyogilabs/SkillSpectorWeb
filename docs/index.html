@@ -127,7 +127,7 @@
 
         <button class="btn-icon" id="settingsBtn" aria-label="Open Engine Settings">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-          Settings & LiteLLM AI
+          Settings
         </button>
       </div>
     </header>
@@ -151,10 +151,30 @@
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
           </span>
           <input type="text" class="url-input" id="urlInput" placeholder="Paste GitHub Repository URL (e.g. https://github.com/Bhanunamikaze/Agentic-SEO-Skill or owner/repo)..." aria-label="GitHub Repository URL Input">
+          
+          <!-- Engine Selection Combo Box -->
+          <div class="engine-select-wrapper">
+            <select class="engine-select" id="engineSelect" aria-label="Select Security Inspection Engine">
+              <option value="no-llm" selected>⚡ No-LLM</option>
+              <option value="litellm">🤖 LiteLLM Proxy</option>
+              <option value="ollama">🦙 Ollama Local</option>
+              <option value="lmstudio">💻 LM Studio</option>
+              <option value="openrouter">🌐 OpenRouter / Direct API</option>
+            </select>
+          </div>
+
           <button class="btn-primary" id="scanBtn" aria-label="Inspect Skill Security">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             Inspect Skill
           </button>
+        </div>
+
+        <!-- Dynamic Engine Mode Help Note -->
+        <div id="engineHelpNote" style="margin-top: 0.85rem; font-size: 0.85rem; color: var(--text-secondary); background: var(--bg-tertiary); padding: 0.65rem 1rem; border-radius: var(--radius-sm); border-left: 3px solid var(--accent-cyan); display: flex; align-items: flex-start; gap: 0.5rem;">
+          <span style="font-size: 1rem;">ℹ️</span>
+          <span id="engineHelpText">
+            <strong>⚡ No-LLM Mode:</strong> Performs 100% browser-executed static WASM pattern matching. <em>No semantic LLM analysis will be performed.</em> Select LM Studio, Ollama, or LiteLLM to enable secondary semantic AI auditing via your configured endpoint in Settings.
+          </span>
         </div>
 
         <div id="codeBox" style="display: none;">
@@ -335,29 +355,16 @@
           </div>
         </div>
 
-        <!-- Optional Trial LiteLLM Semantic AI Analysis Card -->
-        <div class="export-card" style="margin-top: 1.5rem; background: rgba(2, 132, 199, 0.04); border: 1px solid rgba(2, 132, 199, 0.2);">
-          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-            <div>
-              <div style="font-weight: 700; font-size: 1.05rem; color: var(--accent-cyan); display: flex; align-items: center; gap: 0.5rem;">
-                🤖 Optional Trial: Deep Semantic LLM Analysis
-                <span class="brand-badge" style="font-size: 0.7rem; background: rgba(59, 130, 246, 0.15); color: var(--accent-cyan);">LiteLLM Compatible</span>
-              </div>
-              <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.3rem;">
-                Connect to your own LiteLLM Localhost Proxy, Enterprise Gateway, or OpenAI API key to verify code intent against prompt claims. Zero credentials touch Niyogi Labs.
-              </div>
-            </div>
-
-            <button class="btn-primary" id="runTrialSemanticBtn" style="background: var(--accent-gradient);">
-              🤖 Run Trial Semantic Audit
-            </button>
+        <!-- Semantic LLM Security Audit Card Container -->
+        <div class="export-card" id="semanticCardContainer" style="display: none; margin-top: 1.5rem; background: rgba(2, 132, 199, 0.04); border: 1px solid rgba(2, 132, 199, 0.2);">
+          <div style="font-weight: 700; font-size: 1.05rem; color: var(--accent-cyan); display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+            🤖 Secondary Semantic LLM Security Audit
+            <span class="brand-badge" style="font-size: 0.7rem; background: rgba(59, 130, 246, 0.15); color: var(--accent-cyan);">Multi-LLM (LM Studio, Ollama, LiteLLM)</span>
           </div>
 
           <!-- Semantic Output Results Area -->
-          <div id="semanticResultsBox" style="display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed var(--border-color);">
-            <div id="semanticLoading" style="display: none; color: var(--accent-cyan); font-weight: 600;">
-              ⏳ Querying LiteLLM / Semantic LLM Endpoint...
-            </div>
+          <div id="semanticResultsBox">
+            <div id="semanticLoading" style="display: none; color: var(--accent-cyan); font-weight: 600;"></div>
             <div id="semanticOutput"></div>
           </div>
         </div>
@@ -491,6 +498,9 @@
             <button type="button" class="sample-pill" id="btnPresetOllama">
               🦙 Ollama Local (http://localhost:11434/v1)
             </button>
+            <button type="button" class="sample-pill" id="btnPresetLMStudio">
+              💻 LM Studio (http://localhost:1234/v1)
+            </button>
             <button type="button" class="sample-pill" id="btnPresetOpenRouter">
               🌐 OpenRouter / OpenAI Direct
             </button>
@@ -512,9 +522,13 @@
           <input type="text" class="form-input" id="litellmModelInput" placeholder="gpt-4o-mini, claude-3-5-sonnet, llama3">
         </div>
 
-        <div style="text-align: right; margin-top: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem;">
+          <button type="button" class="btn-icon" id="testLlmBtn" style="border: 1px solid var(--accent-cyan); color: var(--accent-cyan);">
+            🔌 Test LLM Connection
+          </button>
           <button class="btn-primary" id="saveSettingsBtn">Save Settings</button>
         </div>
+        <div id="testLlmStatus" style="display: none; margin-top: 0.75rem; font-size: 0.85rem;"></div>
       </div>
     </div>
 
@@ -529,7 +543,7 @@
   <script src="js/github-fetcher.js"></script>
   <script src="js/repo-filter.js"></script>
   <script src="js/skillspector-engine.js"></script>
-  <script src="js/litellm-semantic-analyzer.js"></script>
+  <script src="js/llm-semantic-analyzer.js"></script>
   <script src="js/export-utils.js"></script>
   <script src="js/baseline-generator.js"></script>
   <script src="js/app.js"></script>

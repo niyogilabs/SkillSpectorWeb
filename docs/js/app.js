@@ -151,11 +151,54 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  const btnPresetLMStudio = document.getElementById("btnPresetLMStudio");
+  if (btnPresetLMStudio) {
+    btnPresetLMStudio.addEventListener("click", () => {
+      litellmEndpointInput.value = "http://localhost:1234/v1/chat/completions";
+      litellmKeyInput.value = "";
+      litellmModelInput.value = "local-model";
+    });
+  }
+
   if (btnPresetOpenRouter) {
     btnPresetOpenRouter.addEventListener("click", () => {
       litellmEndpointInput.value = "https://openrouter.ai/api/v1/chat/completions";
       litellmKeyInput.value = "";
       litellmModelInput.value = "openai/gpt-4o-mini";
+    });
+  }
+
+  // Handle engine dropdown selection & dynamic help text
+  const engineSelect = document.getElementById("engineSelect");
+  const engineHelpText = document.getElementById("engineHelpText");
+
+  const helpMessages = {
+    "no-llm": '<strong>⚡ No-LLM Mode:</strong> Performs 100% browser-executed static WASM pattern matching. <em>No semantic LLM analysis will be performed.</em> Select LM Studio, Ollama, or LiteLLM to enable secondary semantic AI auditing.',
+    "litellm": '<strong>🤖 LiteLLM Proxy Selected:</strong> Performs static WASM analysis first, then automatically queries your LiteLLM Proxy endpoint (configured in Settings) for secondary semantic AI auditing.',
+    "ollama": '<strong>🦙 Ollama Local Selected:</strong> Performs static WASM analysis first, then automatically queries your local Ollama server (http://localhost:11434) for secondary semantic AI auditing.',
+    "lmstudio": '<strong>💻 LM Studio Selected:</strong> Performs static WASM analysis first, then automatically queries your local LM Studio server (http://localhost:1234) for secondary semantic AI auditing.',
+    "openrouter": '<strong>🌐 OpenRouter / Direct API Selected:</strong> Performs static WASM analysis first, then automatically queries OpenRouter for secondary semantic AI auditing.'
+  };
+
+  if (engineSelect) {
+    engineSelect.addEventListener("change", () => {
+      const mode = engineSelect.value;
+      if (engineHelpText && helpMessages[mode]) {
+        engineHelpText.innerHTML = helpMessages[mode];
+      }
+      if (mode === "litellm") {
+        litellmEndpointInput.value = "http://localhost:4000/v1/chat/completions";
+        litellmModelInput.value = "gpt-4o-mini";
+      } else if (mode === "ollama") {
+        litellmEndpointInput.value = "http://localhost:11434/v1/chat/completions";
+        litellmModelInput.value = "llama3";
+      } else if (mode === "lmstudio") {
+        litellmEndpointInput.value = "http://localhost:1234/v1/chat/completions";
+        litellmModelInput.value = "local-model";
+      } else if (mode === "openrouter") {
+        litellmEndpointInput.value = "https://openrouter.ai/api/v1/chat/completions";
+        litellmModelInput.value = "openai/gpt-4o-mini";
+      }
     });
   }
 
@@ -283,10 +326,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     currentReport = report;
+    currentFilesMap = filesMap;
     renderResults(report, metaMeta);
     showLoading(false);
     resultsSection.classList.add("active");
     resultsSection.scrollIntoView({ behavior: "smooth" });
+
+    if (engineSelect && engineSelect.value !== "no-llm") {
+      triggerSemanticAnalysis();
+    }
   }
 
   function renderResults(report, metaMeta = {}) {
@@ -314,8 +362,10 @@ document.addEventListener("DOMContentLoaded", () => {
     statTime.textContent = new Date().toLocaleTimeString();
 
     // Reset semantic UI box
-    semanticResultsBox.style.display = "none";
-    semanticOutput.innerHTML = "";
+    const semanticCardContainer = document.getElementById("semanticCardContainer");
+    if (semanticCardContainer) semanticCardContainer.style.display = "none";
+    if (semanticResultsBox) semanticResultsBox.style.display = "block";
+    if (semanticOutput) semanticOutput.innerHTML = "";
 
     // Gauge Score
     gaugeNumber.textContent = report.riskScore;
@@ -382,70 +432,133 @@ document.addEventListener("DOMContentLoaded", () => {
     renderLedger(report.ledger);
   }
 
-  // Trial Semantic LLM Analysis Handler
-  runTrialSemanticBtn.addEventListener("click", async () => {
-    if (!currentReport) return;
+  // Trigger Semantic LLM Analysis
+  async function triggerSemanticAnalysis() {
+    if (!currentReport || !currentReport.filesMap) return;
 
-    // Concatenate skill content for evaluation
-    let sampleCode = "";
-    for (const [path, content] of Object.entries(currentReport.filesMap)) {
-      sampleCode += `=== FILE: ${path} ===\n${content}\n\n`;
-    }
-
+    const semanticCardContainer = document.getElementById("semanticCardContainer");
+    if (semanticCardContainer) semanticCardContainer.style.display = "block";
     semanticResultsBox.style.display = "block";
     semanticLoading.style.display = "block";
-    semanticOutput.innerHTML = "";
+    semanticLoading.innerHTML = `
+      <div style="margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+        <strong style="color: var(--accent-cyan);" id="semProgTitle">⏳ Initializing LLM Semantic Audit...</strong>
+        <span style="font-size: 0.8rem; color: var(--text-muted);" id="semProgPct">0%</span>
+      </div>
+      <div style="width: 100%; height: 8px; background: var(--bg-tertiary); border-radius: var(--radius-full); overflow: hidden; margin-bottom: 0.75rem;">
+        <div id="semProgBar" style="width: 5%; height: 100%; background: var(--accent-cyan); transition: width 0.3s ease;"></div>
+      </div>
+    `;
+    semanticOutput.innerHTML = `
+      <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem;">
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--accent-cyan); margin-bottom: 0.75rem;">
+          📋 Per-Skill LLM Security Reviews (Auditing Skills in Progress...):
+        </div>
+        <div id="semanticSkillCardsList"></div>
+      </div>
+    `;
 
     const config = {
       endpoint: litellmEndpointInput.value.trim(),
       apiKey: litellmKeyInput.value.trim(),
-      model: litellmModelInput.value.trim()
+      model: litellmModelInput.value.trim(),
+      onProgress: (current, total, skillName, filePath, providerName) => {
+        const pct = Math.round((current / total) * 100);
+        const semProgTitle = document.getElementById("semProgTitle");
+        const semProgPct = document.getElementById("semProgPct");
+        const semProgBar = document.getElementById("semProgBar");
+
+        if (semProgTitle) semProgTitle.textContent = `⏳ LLM Auditing Skill ${current} of ${total}: "${skillName}" (${providerName})`;
+        if (semProgPct) semProgPct.textContent = `${pct}%`;
+        if (semProgBar) semProgBar.style.width = `${pct}%`;
+      },
+      onSkillDone: (review, current, total) => {
+        const container = document.getElementById("semanticSkillCardsList");
+        if (container) {
+          const card = document.createElement("div");
+          card.style.cssText = "background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.85rem; margin-top: 0.6rem;";
+          card.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">
+              <strong style="color: var(--text-primary); font-size: 0.9rem;">🎯 Skill #${current} of ${total}: ${escapeHtml(review.skillName)} <span style="font-size: 0.75rem; color: var(--text-muted);">(${escapeHtml(review.filePath)})</span></strong>
+              <span class="verdict-badge ${(review.verdict || 'PASS').toLowerCase()}" style="font-size: 0.75rem; padding: 0.2rem 0.6rem;">${review.verdict || 'PASS'}</span>
+            </div>
+            <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.4rem;">
+              <strong>Intent & Security Assessment:</strong> ${escapeHtml(review.intentAnalysis || 'Code matches stated prompt capabilities.')}
+            </div>
+            ${review.vulnerabilities && review.vulnerabilities.length > 0 ? `
+              <div style="font-weight: 600; font-size: 0.8rem; color: var(--severity-high); margin-top: 0.4rem;">Identified Semantic Vulnerabilities:</div>
+              ${review.vulnerabilities.map(v => `
+                <div style="font-size: 0.8rem; background: rgba(220, 38, 38, 0.08); border-left: 3px solid var(--severity-high); padding: 0.4rem 0.6rem; margin-top: 0.3rem;">
+                  ⚠️ ${escapeHtml(typeof v === 'object' ? v.title || v.explanation || JSON.stringify(v) : String(v))}
+                </div>
+              `).join('')}
+            ` : `<div style="font-size: 0.8rem; color: var(--verdict-pass); margin-top: 0.2rem;">✓ No semantic intent anomalies detected for this skill.</div>`}
+          `;
+          container.appendChild(card);
+        }
+      }
     };
 
-    const response = await litellmAnalyzer.analyzeSemantics({
-      targetName: currentReport.targetName,
-      skillCode: sampleCode,
-      staticFindings: currentReport.findings,
-      config: config
-    });
+    try {
+      const response = await litellmAnalyzer.analyzeSemantics({
+        targetName: currentReport.targetName,
+        staticFindings: currentReport.findings,
+        filesMap: currentReport.filesMap,
+        discoveredSkills: currentReport.discoveredSkills || [],
+        config: config
+      });
 
-    semanticLoading.style.display = "none";
+      semanticLoading.style.display = "none";
 
-    if (response.success) {
-      const res = response.result;
-      semanticOutput.innerHTML = `
-        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem; margin-top: 0.5rem;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-            <span style="font-weight: 700; color: var(--accent-cyan);">🤖 LiteLLM Semantic Audit Results (${response.model})</span>
-            <span class="verdict-badge ${(res.verdict || 'PASS').toLowerCase()}">${res.verdict || 'PASS'}</span>
+      if (response.success) {
+        const res = response;
+        const container = document.getElementById("semanticSkillCardsList");
+        const cardsInnerHtml = container ? container.innerHTML : "";
+
+        semanticOutput.innerHTML = `
+          <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+              <span style="font-weight: 700; color: var(--accent-cyan); font-size: 1rem;">
+                🤖 ${res.provider} Semantic Audit Report (${res.model})
+              </span>
+              <span class="verdict-badge ${(res.verdict || 'PASS').toLowerCase()}">
+                Overall Risk Score: ${res.semanticRiskScore} / 100
+              </span>
+            </div>
+
+            <div style="font-size: 0.9rem; color: var(--text-primary); margin-bottom: 1rem; background: var(--bg-tertiary); padding: 0.75rem; border-radius: var(--radius-sm);">
+              <strong>Repository Security Summary:</strong> ${escapeHtml(res.overallSummary || 'Semantic audit completed across all discovered agent skills.')}
+            </div>
+
+            <div style="font-weight: 700; font-size: 0.95rem; color: var(--accent-cyan); margin-top: 1rem; margin-bottom: 0.5rem;">
+              📋 Per-Skill LLM Security Reviews (${res.skillReviews.length} Discovered Skill(s) Audited):
+            </div>
+
+            <div id="semanticSkillCardsList">${cardsInnerHtml}</div>
+
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 1rem; text-align: right;">
+              Queried via: <code>${res.endpoint}</code>
+            </div>
           </div>
-          <div style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.8rem;">
-            <strong>Intent Analysis:</strong> ${res.intentAnalysis || 'Code matches stated intent.'}
+        `;
+      } else {
+        semanticOutput.innerHTML = `
+          <div style="background: rgba(220, 38, 38, 0.08); border: 1px solid rgba(220, 38, 38, 0.3); border-radius: var(--radius-md); padding: 1rem; color: var(--severity-critical); font-size: 0.85rem;">
+            <strong>⚠️ LLM Query Failed:</strong> ${response.error}
           </div>
-          ${res.semanticVulnerabilities && res.semanticVulnerabilities.length > 0 ? `
-            <div style="font-weight: 600; font-size: 0.85rem; color: var(--severity-high); margin-bottom: 0.3rem;">Semantic Vulnerabilities Identified:</div>
-            ${res.semanticVulnerabilities.map(v => `
-              <div style="font-size: 0.8rem; background: rgba(220, 38, 38, 0.08); border-left: 3px solid var(--severity-high); padding: 0.5rem; margin-bottom: 0.4rem;">
-                <strong>${v.title} (${v.severity})</strong>: ${v.explanation}
-              </div>
-            `).join('')}
-          ` : `<div style="font-size: 0.85rem; color: var(--verdict-pass);">✓ No semantic intent anomalies detected by LLM.</div>`}
-          <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem; text-align: right;">
-            Queried via: <code>${response.endpoint}</code>
-          </div>
-        </div>
-      `;
-    } else {
+        `;
+      }
+    } catch (err) {
+      semanticLoading.style.display = "none";
       semanticOutput.innerHTML = `
         <div style="background: rgba(220, 38, 38, 0.08); border: 1px solid rgba(220, 38, 38, 0.3); border-radius: var(--radius-md); padding: 1rem; color: var(--severity-critical); font-size: 0.85rem;">
-          <strong>⚠️ LiteLLM Query Failed:</strong> ${response.error}
-          <div style="margin-top: 0.5rem; color: var(--text-secondary); font-size: 0.75rem;">
-            Ensure LiteLLM proxy is running (e.g. <code>docker run -p 4000:4000 ghcr.io/berriai/litellm:main-latest</code>) or update API settings.
-          </div>
+          <strong>⚠️ LLM Connection Error:</strong> ${err.message}
         </div>
       `;
     }
-  });
+  }
+
+  runTrialSemanticBtn.addEventListener("click", () => triggerSemanticAnalysis());
 
   function renderCategories(report) {
     categoriesList.innerHTML = "";
@@ -618,6 +731,33 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!currentReport) return;
     downloadFile(`.skillspector-baseline.yaml`, window.BaselineGenerator.generateBaseline(currentReport));
   });
+
+  // Test LLM Connection Handler
+  const testLlmBtn = document.getElementById("testLlmBtn");
+  const testLlmStatus = document.getElementById("testLlmStatus");
+
+  if (testLlmBtn) {
+    testLlmBtn.addEventListener("click", async () => {
+      testLlmStatus.style.display = "block";
+      testLlmStatus.style.color = "var(--accent-cyan)";
+      testLlmStatus.innerHTML = "⏳ Testing LLM Endpoint Connection...";
+
+      const config = {
+        endpoint: litellmEndpointInput.value.trim(),
+        apiKey: litellmKeyInput.value.trim(),
+        model: litellmModelInput.value.trim()
+      };
+
+      try {
+        const res = await litellmAnalyzer.testConnection(config);
+        testLlmStatus.style.color = "var(--verdict-pass)";
+        testLlmStatus.innerHTML = `✅ Successfully connected to LLM server at <code>${res.url}</code>!`;
+      } catch (err) {
+        testLlmStatus.style.color = "var(--severity-critical)";
+        testLlmStatus.innerHTML = `⚠️ Connection Failed: ${err.message}<br><span style="color: var(--text-secondary); font-size: 0.8rem;">Check that your local LLM server (LM Studio / Ollama) is running and CORS is enabled.</span>`;
+      }
+    });
+  }
 
   // Modal Settings
   settingsBtn.addEventListener("click", () => settingsModal.classList.add("active"));

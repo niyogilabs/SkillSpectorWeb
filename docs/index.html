@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <!-- Primary SEO Meta Tags -->
-  <title>SkillSpector Web | Free Online AI Agent Skill Security Scanner (Claude Code, Cursor, MCP)</title>
-  <meta name="title" content="SkillSpector Web | Free Online AI Agent Skill Security Scanner (Claude Code, Cursor, MCP)">
-  <meta name="description" content="SkillSpector Web is an online WebAssembly security scanner for AI agent skills hosted on GitHub. Inspect Claude Code skills, Cursor rules, MCP servers, and agent prompts for prompt injection, secret exfiltration, and tool safety directly in your browser.">
-  <meta name="keywords" content="SkillSpector, SkillSpector Web, AI agent security, agent skill scanner, Claude Code skills audit, Cursor rules security, MCP tool security, prompt injection scanner, credential theft detector, WASM security scanner, Niyogi Labs">
+  <title>AI Agent Security Scanner & Prompt Injection Detector | SkillSpector Web</title>
+  <meta name="title" content="AI Agent Security Scanner & Prompt Injection Detector | SkillSpector Web">
+  <meta name="description" content="Free online AI agent security scanner & prompt injection detector. Run Claude Code security scans, Cursor rules analyzer, MCP server security audits, AI data exfiltration, privilege escalation, and GitHub AI skill audits in your browser.">
+  <meta name="keywords" content="Prompt injection detector, AI agent security scanner, MCP server security, Model Context Protocol scanner, Claude Code security scan, Cursor rules analyzer, AI data exfiltration scanner, AI privilege escalation scanner, GitHub AI skill scanner, Credential theft in AI agents, AI skill security audit, Zero-trust AI code scanner, SkillSpector Web, Niyogi Labs">
   <meta name="author" content="Niyogi Labs">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://skillspector.niyogilabs.com/">
@@ -16,16 +16,16 @@
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://skillspector.niyogilabs.com/">
-  <meta property="og:title" content="SkillSpector Web | Free Online AI Agent Skill Security Scanner">
-  <meta property="og:description" content="Client-side WebAssembly security scanner for AI agent skills hosted on GitHub. Audit Claude Code skills, Cursor rules, and MCP tools for prompt injection and secret exfiltration online.">
+  <meta property="og:title" content="AI Agent Security Scanner & Prompt Injection Detector | SkillSpector Web">
+  <meta property="og:description" content="Free client-side AI agent security scanner & prompt injection detector. Run Claude Code security scans, Cursor rules analyzer, MCP server security audits, and zero-trust AI skill audits online.">
   <meta property="og:site_name" content="SkillSpector Web by Niyogi Labs">
   <meta property="og:image" content="https://skillspector.niyogilabs.com/og-image.png">
 
   <!-- Twitter -->
   <meta property="twitter:card" content="summary_large_image">
   <meta property="twitter:url" content="https://skillspector.niyogilabs.com/">
-  <meta property="twitter:title" content="SkillSpector Web | AI Agent Skill Security Scanner">
-  <meta property="twitter:description" content="Inspect GitHub-hosted AI agent skills for prompt injection and security vulnerabilities directly in your browser.">
+  <meta property="twitter:title" content="AI Agent Security Scanner & Prompt Injection Detector">
+  <meta property="twitter:description" content="Inspect GitHub-hosted AI agent skills for prompt injection, credential theft, and data exfiltration directly in your browser.">
   <meta property="twitter:image" content="https://skillspector.niyogilabs.com/og-image.png">
 
   <!-- JSON-LD Structured Data Schemas (WebApplication & FAQPage for SEO & LLM Search) -->
@@ -35,8 +35,20 @@
       "@context": "https://schema.org",
       "@type": "WebApplication",
       "name": "SkillSpector Web",
+      "alternateName": [
+        "Prompt Injection Detector",
+        "AI Agent Security Scanner",
+        "MCP Server Security Scanner",
+        "Model Context Protocol Scanner",
+        "Claude Code Security Scan",
+        "Cursor Rules Analyzer",
+        "AI Data Exfiltration Scanner",
+        "AI Privilege Escalation Scanner",
+        "GitHub AI Skill Scanner",
+        "Zero-Trust AI Code Scanner"
+      ],
       "url": "https://skillspector.niyogilabs.com",
-      "description": "Client-side browser security scanner for AI agent skills (Claude Code, Cursor, MCP, custom agents) hosted on GitHub.",
+      "description": "Client-side AI agent security scanner and prompt injection detector for Claude Code skills, Cursor rules, Model Context Protocol (MCP) servers, and GitHub AI skills.",
       "applicationCategory": "SecurityApplication",
       "operatingSystem": "All",
       "browserRequirements": "Requires JavaScript and HTML5",
@@ -57,34 +69,42 @@
       "mainEntity": [
         {
           "@type": "Question",
-          "name": "What is SkillSpector Web?",
+          "name": "What is SkillSpector Web AI agent security scanner & prompt injection detector?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "SkillSpector Web is a 100% client-side browser WebAssembly port of SkillSpector v2.5.1 maintained by Niyogi Labs. It inspects AI agent skills, Claude Code skills, Cursor rules, and MCP tools hosted on GitHub for security vulnerabilities."
+            "text": "SkillSpector Web is a 100% client-side browser port of SkillSpector v2.12.0 maintained by Niyogi Labs. It operates as an AI agent security scanner and prompt injection detector for Claude Code skills, Cursor rules, MCP servers, and GitHub AI skills."
           }
         },
         {
           "@type": "Question",
-          "name": "Is my source code uploaded to any backend server?",
+          "name": "How does SkillSpector perform an MCP server security scan & Model Context Protocol audit?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "No. SkillSpector Web runs entirely in your web browser. Repository files are fetched directly via public GitHub REST APIs and scanned using in-browser WebAssembly/JavaScript rules. Zero source code is sent to Niyogi Labs."
+            "text": "SkillSpector Web parses mcp.json manifests and server tool descriptions to detect parameter poisoning, arbitrary command execution vectors, rug pulls, and least-privilege violations directly in your browser."
           }
         },
         {
           "@type": "Question",
-          "name": "What security vulnerabilities does SkillSpector Web scan for?",
+          "name": "How do I run a Claude Code security scan or Cursor rules analyzer on GitHub skills?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "SkillSpector Web scans for Prompt Injection (P1-P8), Data Exfiltration (E1-E5), Privilege Escalation (PE1-PE3), Supply Chain Attacks (SC1-SC3), Excessive Agency (EA1-EA4), and MCP Tool Poisoning (MCP1)."
+            "text": "Paste any GitHub repository URL or SKILL.md content into the search bar. The scanner automatically expands repository trees, parses .cursorrules and Claude Code manifests, and flags unauthorized host access, env harvesting, and prompt injection."
           }
         },
         {
           "@type": "Question",
-          "name": "How can I connect my own LiteLLM proxy for semantic AI auditing?",
+          "name": "How does SkillSpector detect AI data exfiltration and AI privilege escalation?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Click 'Settings & LiteLLM AI' in the top navigation bar to select LiteLLM Localhost Proxy (http://localhost:4000), Enterprise Gateway, Ollama, or OpenRouter. Your API keys are called directly from your browser and saved exclusively in session memory."
+            "text": "The engine scans for process.env secret harvesting (E2), external webhook exfiltration URLs (E1), cloud storage bucket uploads (E5), sudo command execution (PE1), and host credential file reading (.ssh/id_rsa, .aws/credentials)."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I perform a zero-trust AI skill security audit to prevent credential theft?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Run an instant Zero-Trust AI skill security audit directly on your web browser. Zero source code is uploaded to external backend servers; all parsing and pattern checks execute locally in browser memory."
           }
         }
       ]
@@ -105,7 +125,7 @@
           <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-5.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8s0 0 0 0z"/></svg>
         </div>
         <div class="brand-text">SkillSpector Web</div>
-        <span class="brand-badge" style="background: rgba(2, 132, 199, 0.12); color: var(--accent-cyan); border: 1px solid var(--border-color);">Engine v2.5.1</span>
+        <span class="brand-badge" style="background: rgba(2, 132, 199, 0.12); color: var(--accent-cyan); border: 1px solid var(--border-color);">Engine v2.12.0</span>
       </a>
 
       <div class="nav-actions">
@@ -134,10 +154,24 @@
 
     <!-- Main Hero -->
     <section class="hero">
-      <h1 class="hero-title">Inspect Any AI Agent Skill <span>Directly in Your Browser</span></h1>
+      <h1 class="hero-title">AI Agent Security Scanner & <span>Prompt Injection Detector</span></h1>
       <p class="hero-subtitle">
-        SkillSpector Web is a WebAssembly / browser port of SkillSpector maintained for user convenience by <a href="https://niyogilabs.com" target="_blank" rel="noopener" style="color: var(--accent-cyan); text-decoration: none; font-weight: 600;">Niyogi Labs</a>. It enables instant security analysis of AI agent skills (Claude Code skills, Cursor rules, MCP servers) hosted on GitHub for prompt injection, credential theft, malicious tools, and privilege escalation directly in your browser.
+        SkillSpector Web by <a href="https://niyogilabs.com" target="_blank" rel="noopener" style="color: var(--accent-cyan); text-decoration: none; font-weight: 600;">Niyogi Labs</a> is an online <strong>AI agent security scanner</strong> and <strong>prompt injection detector</strong>. Run a <strong>Claude Code security scan</strong>, <strong>Cursor rules analyzer</strong>, <strong>MCP server security audit</strong>, or <strong>GitHub AI skill scanner</strong> for <strong>AI data exfiltration</strong>, <strong>AI privilege escalation</strong>, and <strong>credential theft in AI agents</strong> directly in your browser.
       </p>
+
+      <!-- Key Search Capabilities Tags -->
+      <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; margin-top: 1rem; margin-bottom: 0.5rem;">
+        <span class="sample-pill" style="border-color: rgba(2, 132, 199, 0.4); color: var(--accent-cyan);">🛡️ Prompt Injection Detector</span>
+        <span class="sample-pill" style="border-color: rgba(2, 132, 199, 0.4); color: var(--accent-cyan);">🤖 AI Agent Security Scanner</span>
+        <span class="sample-pill" style="border-color: rgba(2, 132, 199, 0.4); color: var(--accent-cyan);">🔌 MCP Server Security</span>
+        <span class="sample-pill" style="border-color: rgba(2, 132, 199, 0.4); color: var(--accent-cyan);">💻 Claude Code Security Scan</span>
+        <span class="sample-pill" style="border-color: rgba(2, 132, 199, 0.4); color: var(--accent-cyan);">🔍 Cursor Rules Analyzer</span>
+        <span class="sample-pill" style="border-color: rgba(2, 132, 199, 0.4); color: var(--accent-cyan);">🔒 AI Data Exfiltration Scanner</span>
+        <span class="sample-pill" style="border-color: rgba(2, 132, 199, 0.4); color: var(--accent-cyan);">⚡ AI Privilege Escalation Scanner</span>
+        <span class="sample-pill" style="border-color: rgba(2, 132, 199, 0.4); color: var(--accent-cyan);">📦 GitHub AI Skill Scanner</span>
+        <span class="sample-pill" style="border-color: rgba(2, 132, 199, 0.4); color: var(--accent-cyan);">🔑 Credential Theft Guard</span>
+        <span class="sample-pill" style="border-color: rgba(2, 132, 199, 0.4); color: var(--accent-cyan);">📋 Zero-Trust AI Code Audit</span>
+      </div>
 
       <!-- Input Card -->
       <div class="input-card">
@@ -173,7 +207,7 @@
         <div id="engineHelpNote" style="margin-top: 0.85rem; font-size: 0.85rem; color: var(--text-secondary); background: var(--bg-tertiary); padding: 0.65rem 1rem; border-radius: var(--radius-sm); border-left: 3px solid var(--accent-cyan); display: flex; align-items: flex-start; gap: 0.5rem;">
           <span style="font-size: 1rem;">ℹ️</span>
           <span id="engineHelpText">
-            <strong>⚡ No-LLM Mode:</strong> Performs 100% browser-executed static WASM pattern matching. <em>No semantic LLM analysis will be performed.</em> Select LM Studio, Ollama, or LiteLLM to enable secondary semantic AI auditing via your configured endpoint in Settings.
+            <strong>⚡ No-LLM Mode:</strong> Performs 100% browser-executed static pattern matching. <em>No semantic LLM analysis will be performed.</em> Select LM Studio, Ollama, or LiteLLM to enable secondary semantic AI auditing via your configured endpoint in Settings.
           </span>
         </div>
 
@@ -444,15 +478,15 @@
         <div style="display: flex; flex-direction: column; gap: 1.2rem; font-size: 0.9rem; color: var(--text-secondary);">
           <div>
             <strong style="color: var(--text-primary); display: block; margin-bottom: 0.2rem;">What is SkillSpector Web?</strong>
-            SkillSpector Web is an online, 100% browser-executed WebAssembly (WASM) security scanner for AI agent skills, Claude Code skills, Cursor rules, Model Context Protocol (MCP) servers, and custom agent prompts hosted on GitHub.
+            SkillSpector Web is an online, 100% browser-executed security scanner for AI agent skills, Claude Code skills, Cursor rules, Model Context Protocol (MCP) servers, and custom agent prompts hosted on GitHub.
           </div>
           <div>
             <strong style="color: var(--text-primary); display: block; margin-bottom: 0.2rem;">Is my source code uploaded or stored on any server?</strong>
-            No. SkillSpector Web operates under a 100% Zero-Trust privacy model. Repository files are fetched directly via public GitHub APIs and scanned locally inside your browser memory using WebAssembly static analysis rules.
+            No. SkillSpector Web operates under a 100% Zero-Trust privacy model. Repository files are fetched directly via public GitHub APIs and scanned locally inside your browser memory using static analysis rules.
           </div>
           <div>
             <strong style="color: var(--text-primary); display: block; margin-bottom: 0.2rem;">What security vulnerability categories does it inspect?</strong>
-            SkillSpector Web inspects for Prompt Injection (P1–P8), Secret & Data Exfiltration (E1–E5), Privilege Escalation (PE1–PE3), Supply Chain Code Execution (SC1–SC3), Excessive Agency (EA1–EA4), and MCP Tool Poisoning (MCP1).
+            SkillSpector Web inspects for Prompt Injection (P1–P9), Secret & Data Exfiltration (E1–E5), Privilege Escalation (PE1–PE3), Supply Chain Code Execution (SC1–SC10), Excessive Agency (EA1–EA5), Agent Snooping (AS1–AS3), Anti-Refusal Statements (AR1–AR3), SSRF (SSRF1–SSRF3), Insecure Deserialization (DS1–DS4), and MCP Tool Poisoning (TP1–TP4, MCP1).
           </div>
           <div>
             <strong style="color: var(--text-primary); display: block; margin-bottom: 0.2rem;">How do I connect my LiteLLM Proxy or OpenAI API key for semantic AI audits?</strong>
@@ -534,7 +568,7 @@
 
     <!-- Footer -->
     <footer>
-      SkillSpector Web • A WebAssembly / browser port of <a href="https://github.com/NVIDIA/skillspector" target="_blank" rel="noopener">SkillSpector</a> maintained for user convenience by <a href="https://niyogilabs.com" target="_blank" rel="noopener">Niyogi Labs</a> under the <a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener">Apache 2.0 License</a> • Core Engine: v2.5.1
+      SkillSpector Web • A browser port of <a href="https://github.com/NVIDIA/skillspector" target="_blank" rel="noopener">SkillSpector</a> maintained for user convenience by <a href="https://niyogilabs.com" target="_blank" rel="noopener">Niyogi Labs</a> under the <a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener">Apache 2.0 License</a> • Core Engine: v2.12.0
     </footer>
   </div>
 

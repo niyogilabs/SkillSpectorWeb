@@ -9,8 +9,8 @@ const SkillSpectorEngine = require('../docs/js/skillspector-engine.js');
 
 const engine = new SkillSpectorEngine();
 
-// Fixtures directory from SkillSpector-2.5.1
-const FIXTURES_DIR = path.resolve(__dirname, '../../SkillSpector-2.5.1/tests/fixtures');
+// Fixtures directory from SkillSpector-2.12.0
+const FIXTURES_DIR = path.resolve(__dirname, '../../SkillSpector-2.12.0/tests/fixtures');
 
 function loadDirectoryFilesMap(dirPath, baseDir = dirPath) {
   let map = {};
@@ -54,12 +54,24 @@ const TEST_CASES = [
     fixtureDir: path.join(FIXTURES_DIR, 'sqp/sqp1_vague_triggers'),
     expectedRules: ['TR1'], // Trigger Abuse
     expectedVerdict: 'WARN'
+  },
+  {
+    id: 'as3_self_reference',
+    fixtureDir: path.join(FIXTURES_DIR, 'as3_self_reference'),
+    expectedRules: [],
+    expectedVerdict: 'PASS'
+  },
+  {
+    id: 'pe3_bare_keyring',
+    fixtureDir: path.join(FIXTURES_DIR, 'pe3_bare_keyring'),
+    expectedRules: ['PE3'],
+    expectedVerdict: 'WARN'
   }
 ];
 
 async function runEquivalenceTests() {
   console.log('==================================================');
-  console.log('🧪 SkillSpectorWeb Functional Equivalence Test Suite');
+  console.log('🧪 SkillSpectorWeb Functional Equivalence Test Suite (v2.12.0)');
   console.log('==================================================\n');
 
   let passed = 0;

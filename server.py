@@ -18,6 +18,13 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=DIRECTORY, **kwargs)
 
+    def do_GET(self):
+        # Pretty URL routing for HTML pages
+        clean_path = self.path.split("?")[0].rstrip("/")
+        if clean_path in ("/scan", "/audit", "/features", "/rules", "/scanner"):
+            self.path = "/index.html"
+        return super().do_GET()
+
     def end_headers(self):
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")

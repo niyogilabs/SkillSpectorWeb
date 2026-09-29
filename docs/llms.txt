@@ -1,28 +1,30 @@
-# SkillSpector Web: Online AI Agent Skill Security Scanner
+# SkillSpector Web: AI Agent Security Scanner & Prompt Injection Detector
 
-> SkillSpector Web is a 100% browser-executed WebAssembly (WASM) security scanner for AI agent skills (Claude Code skills, Cursor rules, MCP tools, and custom agent skills) hosted on GitHub. Maintained by Niyogi Labs.
+> SkillSpector Web is a 100% browser-executed **AI agent security scanner** and **prompt injection detector** for Claude Code skills, Cursor rules, Model Context Protocol (MCP) servers, and GitHub AI skills. Maintained by Niyogi Labs.
 
-- Website: https://skillspector.niyogilabs.com
-- Upstream Engine: SkillSpector v2.5.1 (Apache 2.0 License)
+- Website: https://skillspector.niyogilabs.com/
+- Upstream Engine: SkillSpector v2.12.0 (Apache 2.0 License)
 - GitHub Repository: https://github.com/NVIDIA/skillspector
 
-## What SkillSpector Web Scans For
+## Core Capabilities & Threat Inspection
 
-SkillSpector Web performs static security analysis and optional semantic LLM audits to detect:
-1. **Prompt Injection (P1–P8)**: System prompt overrides, hidden HTML comment directives, zero-width space injections, and system prompt leakage.
-2. **Data Exfiltration (E1–E5)**: External exfiltration webhooks, unauthorized `os.environ` / `process.env` secret access, cloud storage uploads, and conversation history leakage.
-3. **Privilege Escalation (PE1–PE3)**: `sudo` command execution, `chmod 777` permissions, and host filesystem credential file harvesting (`.ssh/id_rsa`, `.aws/credentials`).
-4. **Supply Chain Attacks (SC1–SC3)**: Unpinned remote dependencies, `curl | bash` pipe-to-shell scripts, and base64/hex obfuscated binary payloads.
-5. **Excessive Agency (EA1–EA4)**: Unconstrained tool execution, missing human-in-the-loop confirmation, scope creep, and unbounded resource consumption.
-6. **MCP Security (MCP1)**: Model Context Protocol (MCP) tool poisoning, rug pulls, and least-privilege violations.
+SkillSpector Web performs static security analysis and zero-trust AI skill security audits to detect:
+1. **Prompt Injection Detector (P1–P9)**: Detect system prompt overrides, hidden HTML comment directives, zero-width space injections, whitespace padding concealment, and system prompt leakage.
+2. **AI Data Exfiltration Scanner (E1–E5)**: Catch external exfiltration webhooks, unauthorized `os.environ` / `process.env` secret harvesting, cloud storage bucket uploads, and session leakage.
+3. **AI Privilege Escalation Scanner (PE1–PE3)**: Flag `sudo` command execution, `chmod 777` permissions, and host credential theft (`.ssh/id_rsa`, `.aws/credentials`, keyring).
+4. **MCP Server Security / Model Context Protocol Scanner (LP1–LP4, TP1–TP4, MCP1)**: Audit MCP server manifests (`mcp.json`) for parameter poisoning, unicode homoglyph deception, rug pulls, and least-privilege boundaries.
+5. **Claude Code Security Scan & Cursor Rules Analyzer (SC1–SC10)**: Inspect `.cursorrules` and Claude Code skills for unpinned remote dependencies, `curl | bash` pipe-to-shell scripts, obfuscated base64 binaries, container trust bypass, and bytecode shipping.
+6. **Agent Snooping & Anti-Refusal (AS1–AS3, AR1–AR3)**: Block unauthorized access to agent config dirs (`.claude/`, `.gemini/`), peer skill enumeration, and anti-refusal / jailbreak statement suppression.
+7. **SSRF & Insecure Deserialization (SSRF1–SSRF3, DS1–DS4)**: Flag cloud instance metadata endpoints (`169.254.169.254`), internal loopback requests, and unsafe PHP/Ruby/JS deserialization.
 
 ## Architecture & Privacy Model
 
-- **100% Client-Side WebAssembly**: All static code parsing and pattern matching execute inside the user's browser. Zero source code or repository files are uploaded to backend servers.
-- **Optional LiteLLM Semantic Audit**: Users can optionally connect their own local LiteLLM proxy (`http://localhost:4000`), enterprise gateway, or API key for deep semantic intent verification without sharing credentials with Niyogi Labs.
+- **100% Client-Side Browser**: All static code parsing and pattern matching execute inside the user's browser. Zero source code or repository files are uploaded to backend servers.
+- **Optional LiteLLM Semantic Audit**: Connect your own local LiteLLM proxy (`http://localhost:4000`), enterprise gateway, or API key for deep semantic intent verification without sharing credentials with Niyogi Labs.
 
 ## Useful Links
 
-- [SkillSpector Web App](https://skillspector.niyogilabs.com/)
-- [Sitemap](https://skillspector.niyogilabs.com/sitemap.xml)
-- [Full LLM Specification](https://skillspector.niyogilabs.com/llms-full.txt)
+- [AI Agent Security Scanner Home](https://skillspector.niyogilabs.com/)
+- [Sitemap XML](https://skillspector.niyogilabs.com/sitemap.xml)
+- [LLM Specification (llms.txt)](https://skillspector.niyogilabs.com/llms.txt)
+- [Full LLM Specification (llms-full.txt)](https://skillspector.niyogilabs.com/llms-full.txt)

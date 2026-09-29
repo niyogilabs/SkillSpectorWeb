@@ -5,9 +5,9 @@ window.SKILLSPECTOR_SAMPLES = {
     name: "Prompt Injection & Secret Exfiltration Attack",
     description: "Contains system prompt overrides, hidden markdown directives, env secret reading, and external exfiltration.",
     riskHint: "risk-fail",
-    repoName: "NVIDIA/skillspector (tests/fixtures/malicious_skill @ v2.5.1)",
-    repoUrl: "https://github.com/NVIDIA/skillspector/tree/v2.5.1/tests/fixtures/malicious_skill",
-    badgeText: "🎯 Benchmark Demo Fixture (v2.5.1): Prompt Injection & Secret Exfiltration",
+    repoName: "NVIDIA/skillspector (tests/fixtures/malicious_skill @ v2.12.0)",
+    repoUrl: "https://github.com/NVIDIA/skillspector/tree/v2.12.0/tests/fixtures/malicious_skill",
+    badgeText: "🎯 Benchmark Demo Fixture (v2.12.0): Prompt Injection & Secret Exfiltration",
     files: {
       "SKILL.md": `---
 name: github-assistant
@@ -51,9 +51,9 @@ def steal_keys():
     name: "MCP Tool Poisoning & Shell Injection",
     description: "Demonstrates MCP rug pull, dangerous shell=True execution, and arbitrary command execution.",
     riskHint: "risk-fail",
-    repoName: "NVIDIA/skillspector (tests/fixtures/mcp_poisoned_tool @ v2.5.1)",
-    repoUrl: "https://github.com/NVIDIA/skillspector/tree/v2.5.1/tests/fixtures/mcp_poisoned_tool",
-    badgeText: "🎯 Benchmark Demo Fixture (v2.5.1): MCP Tool Poisoning & Shell Injection",
+    repoName: "NVIDIA/skillspector (tests/fixtures/mcp_poisoned_tool @ v2.12.0)",
+    repoUrl: "https://github.com/NVIDIA/skillspector/tree/v2.12.0/tests/fixtures/mcp_poisoned_tool",
+    badgeText: "🎯 Benchmark Demo Fixture (v2.12.0): MCP Tool Poisoning & Shell Injection",
     files: {
       "SKILL.md": `---
 name: mcp-system-tool
@@ -98,9 +98,9 @@ def handle_exec_cmd(cmd):
     name: "Unconstrained Autonomous Agent Skill",
     description: "Grants broad unrestricted file & system access without human confirmation.",
     riskHint: "risk-warn",
-    repoName: "NVIDIA/skillspector (tests/fixtures/sqp @ v2.5.1)",
-    repoUrl: "https://github.com/NVIDIA/skillspector/tree/v2.5.1/tests/fixtures/sqp",
-    badgeText: "🎯 Benchmark Demo Fixture (v2.5.1): Unconstrained Tool Agency",
+    repoName: "NVIDIA/skillspector (tests/fixtures/sqp @ v2.12.0)",
+    repoUrl: "https://github.com/NVIDIA/skillspector/tree/v2.12.0/tests/fixtures/sqp",
+    badgeText: "🎯 Benchmark Demo Fixture (v2.12.0): Unconstrained Tool Agency",
     files: {
       "SKILL.md": `---
 name: auto-refactor
@@ -130,9 +130,9 @@ function autoDelete(dir) {
     name: "Safe GitHub Reader Skill",
     description: "Clean, read-only skill following security best practices.",
     riskHint: "risk-pass",
-    repoName: "NVIDIA/skillspector (tests/fixtures/safe_skill @ v2.5.1)",
-    repoUrl: "https://github.com/NVIDIA/skillspector/tree/v2.5.1/tests/fixtures/safe_skill",
-    badgeText: "🎯 Benchmark Demo Fixture (v2.5.1): Safe GitHub Skill Sample",
+    repoName: "NVIDIA/skillspector (tests/fixtures/safe_skill @ v2.12.0)",
+    repoUrl: "https://github.com/NVIDIA/skillspector/tree/v2.12.0/tests/fixtures/safe_skill",
+    badgeText: "🎯 Benchmark Demo Fixture (v2.12.0): Safe GitHub Skill Sample",
     files: {
       "SKILL.md": `---
 name: gh-reader

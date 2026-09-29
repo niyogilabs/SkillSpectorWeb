@@ -1,10 +1,10 @@
 # 🛡️ SkillSpector Web
 
-**WebAssembly / Browser Port of SkillSpector Maintained for User Convenience**
+**Browser Port of SkillSpector Maintained for User Convenience**
 
-SkillSpector Web is a client-side WebAssembly / browser port of SkillSpector maintained for user convenience. It enables visitors to input a GitHub repository or `SKILL.md` URL and perform security inspection directly in their browser without requiring local CLI tool installations.
+SkillSpector Web is a client-side browser port of SkillSpector maintained for user convenience. It enables visitors to input a GitHub repository or `SKILL.md` URL and perform security inspection directly in their browser without requiring local CLI tool installations.
 
-- **Derived Version**: SkillSpector `v2.5.1`
+- **Derived Version**: SkillSpector `v2.12.0`
 - **Hosting URL**: `https://skillspector.niyogilabs.com`
 
 ---

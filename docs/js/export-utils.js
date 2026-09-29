@@ -10,7 +10,7 @@ class ExportUtils {
           tool: {
             driver: {
               name: "SkillSpector Web",
-              version: "2.5.1",
+              version: "2.12.0",
               informationUri: "https://github.com/skillspector",
               rules: report.findings.map(f => ({
                 id: f.ruleId,

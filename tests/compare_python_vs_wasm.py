@@ -13,7 +13,7 @@ import sys
 # Paths
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 WEB_DIR = os.path.dirname(BASE_DIR)
-PYTHON_ENGINE_DIR = os.path.abspath(os.path.join(WEB_DIR, "..", "SkillSpector-2.5.1"))
+PYTHON_ENGINE_DIR = os.path.abspath(os.path.join(WEB_DIR, "..", "SkillSpector-2.12.0"))
 
 # Add Python engine to sys.path
 if PYTHON_ENGINE_DIR not in sys.path:

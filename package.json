@@ -1,7 +1,7 @@
 {
   "name": "skillspector-web",
-  "version": "2.5.1",
-  "description": "A WebAssembly / browser port of SkillSpector maintained for user convenience to inspect AI agent skills hosted on GitHub",
+  "version": "2.12.0",
+  "description": "A client-side browser port of SkillSpector maintained for user convenience to inspect AI agent skills hosted on GitHub",
   "main": "docs/index.html",
   "scripts": {
     "start": "python3 server.py 8080",
@@ -15,7 +15,7 @@
     "ai-agents",
     "vulnerability-scanner",
     "browser",
-    "wasm",
+    "javascript",
     "github"
   ],
   "author": "Community Maintainers",

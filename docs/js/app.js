@@ -173,11 +173,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const engineHelpText = document.getElementById("engineHelpText");
 
   const helpMessages = {
-    "no-llm": '<strong>⚡ No-LLM Mode:</strong> Performs 100% browser-executed static WASM pattern matching. <em>No semantic LLM analysis will be performed.</em> Select LM Studio, Ollama, or LiteLLM to enable secondary semantic AI auditing.',
-    "litellm": '<strong>🤖 LiteLLM Proxy Selected:</strong> Performs static WASM analysis first, then automatically queries your LiteLLM Proxy endpoint (configured in Settings) for secondary semantic AI auditing.',
-    "ollama": '<strong>🦙 Ollama Local Selected:</strong> Performs static WASM analysis first, then automatically queries your local Ollama server (http://localhost:11434) for secondary semantic AI auditing.',
-    "lmstudio": '<strong>💻 LM Studio Selected:</strong> Performs static WASM analysis first, then automatically queries your local LM Studio server (http://localhost:1234) for secondary semantic AI auditing.',
-    "openrouter": '<strong>🌐 OpenRouter / Direct API Selected:</strong> Performs static WASM analysis first, then automatically queries OpenRouter for secondary semantic AI auditing.'
+    "no-llm": '<strong>⚡ No-LLM Mode:</strong> Performs 100% browser-executed static pattern matching. <em>No semantic LLM analysis will be performed.</em> Select LM Studio, Ollama, or LiteLLM to enable secondary semantic AI auditing.',
+    "litellm": '<strong>🤖 LiteLLM Proxy Selected:</strong> Performs static pattern analysis first, then automatically queries your LiteLLM Proxy endpoint (configured in Settings) for secondary semantic AI auditing.',
+    "ollama": '<strong>🦙 Ollama Local Selected:</strong> Performs static pattern analysis first, then automatically queries your local Ollama server (http://localhost:11434) for secondary semantic AI auditing.',
+    "lmstudio": '<strong>💻 LM Studio Selected:</strong> Performs static pattern analysis first, then automatically queries your local LM Studio server (http://localhost:1234) for secondary semantic AI auditing.',
+    "openrouter": '<strong>🌐 OpenRouter / Direct API Selected:</strong> Performs static pattern analysis first, then automatically queries OpenRouter for secondary semantic AI auditing.'
   };
 
   if (engineSelect) {

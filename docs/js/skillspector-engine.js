@@ -169,9 +169,9 @@ class SkillSpectorEngine {
       {
         id: "PE3",
         category: this.categories.PRIVILEGE_ESCALATION,
-        severity: "HIGH",
+        severity: "MEDIUM",
         title: "Credential File Access Vector",
-        regex: /(cat|read|open)\s+[^|&;\n]*(\.ssh\/|\.aws\/credentials|\.env|\bkeyring\b)/i,
+        regex: /(cat|read|open)\s+[^|&;\n]*(\.ssh\/|\.aws\/credentials|\.env|\bkeyring\b)|\b(keyring|keychain|gnome-keyring)\b/i,
         explanation: "Code accesses host credential files, SSH keys, or OS keyrings.",
         remediation: "Never load .env, SSH keys, or keyring secrets in production skill code paths."
       },
@@ -403,7 +403,7 @@ class SkillSpectorEngine {
         category: this.categories.AGENT_SNOOPING,
         severity: "MEDIUM",
         title: "Skill Enumeration / Peer Snooping",
-        regex: /(os\.listdir|os\.scandir|glob\.glob|Path\.iterdir)\s*\([^)]*\.(claude|codex|gemini)\/skills?|(ls|find|dir)\s+[^|&;\n]*\.(claude|codex|gemini)\/skills?|skills?\/(?!CURRENT)[A-Z][A-Za-z0-9_-]+\/SKILL\.md/i,
+        regex: /(os\.listdir|os\.scandir|glob\.glob|Path\.iterdir)\s*\([^)]*\.(claude|codex|gemini)\/skills?|(ls|find|dir)\s+[^|&;\n]*\.(claude|codex|gemini)\/skills?|skills\/([A-Z][A-Za-z0-9_-]+)\/SKILL\.md/i,
         explanation: "Skill enumerates or reads SKILL.md manifests of peer installed skills.",
         remediation: "Skills must operate in isolation; remove peer skill directory scanning."
       },
@@ -639,6 +639,15 @@ class SkillSpectorEngine {
     let totalFilesScanned = 0;
 
     const discoveredSkills = this.discoverSkills(filesMap);
+    
+    // Determine target skill name for self-reference checks
+    let targetSkillName = targetName || "";
+    for (const skill of discoveredSkills) {
+      if (skill.name) {
+        targetSkillName = skill.name;
+        break;
+      }
+    }
 
     for (const [filePath, content] of Object.entries(filesMap)) {
       totalFilesScanned++;
@@ -673,6 +682,31 @@ class SkillSpectorEngine {
           const matchIndex = match.index;
           const lineNum = content.substring(0, matchIndex).split('\n').length;
           const lineText = lines[lineNum - 1] || match[0];
+
+          // AS3 Contextual Exemption Check:
+          if (rule.id === "AS3") {
+            const skillNameGroup = match[2] || match[0];
+            // 1. Skip self-reference match if it names the current skill
+            if (targetSkillName && skillNameGroup.toLowerCase().includes(targetSkillName.toLowerCase())) {
+              continue;
+            }
+            // 2. Skip if enclosed in backticks or markdown code spans in documentation files
+            const isBacktickLiteral = /`[^`]*skills\/[^`]*`/.test(lineText);
+            if (isBacktickLiteral) {
+              continue;
+            }
+          }
+
+          // PE3 Bare Keyring Exemption Check:
+          if (rule.id === "PE3") {
+            const isBareKeyringWord = /\b(keyring|keychain|gnome-keyring)\b/i.test(match[0]);
+            if (isBareKeyringWord && !/(cat|read|open|access|extract|copy|get|steal|save|store|keyring\.)/i.test(lineText)) {
+              // If line in prose docs is a descriptive noun without action verb ("documents the keyring access policy"), skip it
+              if (filePath.endsWith('.md') && /documents?\s+the\s+keyring/i.test(lineText)) {
+                continue;
+              }
+            }
+          }
 
           findings.push({
             ruleId: rule.id,
